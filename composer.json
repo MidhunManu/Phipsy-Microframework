@@ -1,0 +1,19 @@
+{
+    "name": "neo/phipsy",
+    "description": "experimental lightweight php framework",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "App/",
+            "Core\\": "core/"
+        }
+    },
+    "authors": [
+        {
+            "name": "MidhunManu",
+            "email": "midhunmanu384@gmail.com"
+        }
+    ],
+    "require": {}
+}
