@@ -8,5 +8,5 @@ $router = new Router();
 
 $router->get('/', [NameController::class, 'index']);
 $router->get('/users', [UserController::class, 'index']);
-
+$router->get('/users/{id}', [UserController::class, 'show']);
 return $router;

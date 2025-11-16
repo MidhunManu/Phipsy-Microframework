@@ -19,21 +19,32 @@ class Router
     public function resolve(string $method, string $uri)
     {
         $uri = parse_url($uri, PHP_URL_PATH);
+    $action = null;
+    $params = [];
 
-        $action = $this->routes[$method][$uri] ?? null;
-
-        if (!$action) {
-            http_response_code(404);
-            echo "404 Not Found";
-            exit;
+    foreach ($this->routes[$method] ?? [] as $route => $a) {
+        $pattern = preg_replace('/\{(\w+)\}/', '(\w+)', $route);
+        if (preg_match("#^$pattern$#", $uri, $matches)) {
+            $action = $a;
+            array_shift($matches); // first element is full match
+            preg_match_all('/\{(\w+)\}/', $route, $keys);
+            $params = array_combine($keys[1], $matches);
+            break;
         }
+    }
 
-        if (is_callable($action)) {
-            return call_user_func($action);
-        }
+    if (!$action) {
+        http_response_code(404);
+        echo "404 Not Found";
+        exit;
+    }
 
-        [$controller, $method] = $action;
-        $controller = new $controller;
-        return $controller->$method();
+    if (is_callable($action)) {
+        return call_user_func($action, new Request($params));
+    }
+
+    [$controller, $method] = $action;
+    $controller = new $controller;
+    return $controller->$method(new Request($params));
     }
 }
