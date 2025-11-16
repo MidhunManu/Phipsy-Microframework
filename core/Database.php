@@ -3,17 +3,37 @@
 namespace Core;
 
 use PDO;
+use PDOException;
+
 class Database
 {
-    private static ?PDO $instance = null;
+    protected static ?PDO $connection = null;
 
-    public static function getConnection(): PDO
+    public static function connect()
     {
-        if (self::$instance === null) {
-            $dbPath = __DIR__ . '/../database/app.sqlite';
-            self::$instance = new PDO("sqlite:$dbPath");
-            self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        if (self::$connection !== null) {
+            return self::$connection;
         }
-        return self::$instance;
+
+        $config = require __DIR__ . '/../config/database.php';
+
+        try {
+            if ($config['driver'] === 'sqlite') {
+                self::$connection = new PDO("sqlite:" . $config['database']);
+            }
+
+            self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return self::$connection;
+
+        } catch (PDOException $e) {
+            die("DB Connection Failed: " . $e->getMessage());
+        }
+    }
+
+    public static function query(string $sql, array $params = [])
+    {
+        $stmt = self::connect()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
     }
 }
