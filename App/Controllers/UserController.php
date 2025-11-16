@@ -33,4 +33,12 @@ class UserController extends Controller
             'user' => $user
         ]);
     }
+
+    public function create(Request $request)
+    {
+        $user = (new User)->create([
+            'name' => $request->input('name'),
+        ]);
+        return json_encode($user);
+    }
 }

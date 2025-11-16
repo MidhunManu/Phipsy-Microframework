@@ -9,4 +9,5 @@ $router = new Router();
 $router->get('/', [NameController::class, 'index']);
 $router->get('/users', [UserController::class, 'index']);
 $router->get('/users/{id}', [UserController::class, 'show']);
+$router->post('/user', [UserController::class, 'create']);
 return $router;
