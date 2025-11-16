@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+$config = require __DIR__ . '/../config/server.php';
+
+function send_request(string $query, string $method, string $params = "{}")
+{
+    global $config;
+
+    $url = $config['base_url'] . $query;
+    $data = http_build_query(json_decode($params, true) ?? []);
+
+    $options = [
+        'http' => [
+            'header'  => "Content-Type: application/json\r\n",
+            'method'  => $method,
+            'content' => $data,
+        ],
+    ];
+
+    $context  = stream_context_create($options);
+    $response = file_get_contents($url, false, $context);
+    echo $response;
+}
+
+send_request($argv[1], $argv[2], $argv[3] ?? "{}");
